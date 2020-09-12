@@ -16,6 +16,8 @@ import numpy as np
 import random
 from PIL import Image, ImageDraw
 from scipy import ndimage
+import os
+import pathlib
 # import matplotlib.pyplot as plt
 
 # from vipixx_something_or_other import button_thread
@@ -72,6 +74,9 @@ dialog_info.addField('bar_sweep_reps:', 1)
 dialog_info.addField('bar_sweep_duration:', 20)
 dialog_info.addField('baseline_duration:', 12)
 dialog_info.addField('save_log:', choices=['No', 'Yes'])
+dialog_info.addField('export_masks:', choices=['No', 'Yes'])
+dialog_info.addField('export_dir:', 'exported')
+dialog_info.addField('export_rate_ms:', 200)
 
 # get the fieldnames use to use as keys in a dictionary
 keys = dialog_info.inputFieldNames
@@ -85,6 +90,38 @@ dialog_info = dialog_info.show()
 
 # combine the list of keys with the input from dialog_info into a dictionary
 setup = dict(zip(keys, dialog_info[:]))
+
+# if we're going to export the stimulus masks (needed for computing prf models)
+# the check how many images would be exported at the requested rate and throw
+# and error if it is over 10'000
+export_im_dir = setup['export_dir']
+export_rate = setup['export_rate_ms']
+if setup['export_masks'] == 'Yes':
+    pa_time, ecc_time, bar_time = 0, 0, 0
+    if setup['run_polar'] == 'Yes':
+        pa_time += setup['pa_cycles']*setup['pa_cycle_duration']
+    if setup['run_ecc'] == 'Yes':
+        ecc_time += setup['ecc_cycles']*setup['ecc_cycle_duration']
+    if setup['run_bars'] == 'Yes':
+        bar_time += setup['bar_sweeps']*setup['bar_sweep_reps']*setup['bar_sweep_duration']
+
+    total_time = max([pa_time, ecc_time, bar_time])
+    if (total_time*1000)/export_rate > 9900:
+        fastest_rate = round((total_time*1000)/10000) - 1
+
+        print(f'\n\n ERROR: You set the export rate too high - at the requested \
+rate, there would be over 10000 images exported. Please \
+choose a lower rate (the fastest allowable rate given the \
+length of this run is about: {fastest_rate} ms)\n\n')
+        logfile.close()
+        win.close()
+        core.quit()
+
+    if not os.path.exists(export_im_dir):
+        pathlib.Path(f"{export_im_dir}").mkdir(parents=True)
+        paramsfile = open(f'''{export_im_dir}/settings_used_when_generating_masks''', 'w')
+    paramsfile.write(f''' sub_id: {setup['sub_id']}\n run_polar: {setup['run_polar']}\n run_ecc: {setup['run_ecc']}\n run_bars: {setup['run_bars']}\n pa_cycles: {setup['pa_cycles']}\n pa_cycle_duration: {setup['pa_cycle_duration']}\n ecc_cycles: {setup['ecc_cycles']}\n ecc_cycle_duration: {setup['ecc_cycle_duration']}\n bar_sweeps: {setup['bar_sweeps']}\n bar_sweep_reps: {setup['bar_sweep_reps']}\n bar_sweep_duration: {setup['bar_sweep_duration']}\n baseline_duration: {setup['baseline_duration']}\n save_log: {setup['save_log']}\n export_masks: {setup['export_masks']}\n export_dir: {setup['export_dir']}\n export_rate_ms: {setup['export_rate_ms']}''')
+    paramsfile.close()
 
 if setup['save_log'] == 'Yes':
     logfile = open(f'''{setup['sub_id']}_PA_{setup['run_polar']}_Ecc_{setup['run_ecc']}_Bars_{setup['run_bars']}_logfile.csv''', 'w')
@@ -328,7 +365,6 @@ win.flip()
 while not 'c' in event.getKeys():
     core.wait(0.1)
 
-
 # =============================================================================
 # start waiting for trigger (coded as z)
 # button_thread.start()
@@ -360,14 +396,16 @@ pa_start = clock.getTime()
 ecc_start = clock.getTime()
 bar_start = clock.getTime()
 flicker_timer = clock.getTime()
+export_timer = clock.getTime()
 
 pa_cycle_count = 0
 ecc_cycle_count = 0
 bar_sweep_count = 0
+export_frame_count = 0
 while True: # we'll break out of this loop once we've shown enough
-
     if spiderweb_grid:
-        draw_siderweb()
+        if setup['export_masks'] == 'No':
+            draw_siderweb()
 
 # =============================================================================
 # prepare polar mask
@@ -443,7 +481,7 @@ while True: # we'll break out of this loop once we've shown enough
 
     # combine masks
     mask = pa_mask + ecc_mask + bar_mask
-    # any pixel that didn'wasn't marked as -1 for all 3 masks should be visible
+    # any pixel that wasn't marked as -1 for all 3 masks should be visible
     mask[mask>-3]=1
     # only pixels marked -1 for all 3 masks should be invisible
     mask[mask==-3]=-1
@@ -466,9 +504,20 @@ while True: # we'll break out of this loop once we've shown enough
 
     # if time for a possible fixation orientation change, randomly choose an
     # orientation and return updated timer and orientation setting
-    rotate_timer, fixation_orientation = fixation_orientation_task(rotate_timer, fixation_orientation)
+
+    if setup['export_masks'] == 'No':
+        rotate_timer, fixation_orientation = fixation_orientation_task(rotate_timer, fixation_orientation)
 
     win.flip()
+
+    # export mask
+    if setup['export_masks'] == 'Yes':
+        # if enough time has elapsed since the last export
+        if clock.getTime()-export_timer > export_rate/1000:
+            win.getMovieFrame()
+            win.saveMovieFrames(f"{export_im_dir}/{export_frame_count:04}_export_rate_{export_rate}ms.png")
+            export_frame_count += 1
+            export_timer = clock.getTime()
 
     if setup['save_log'] == 'Yes':
             logfile.write(f'''{np.round(clock.getTime(), 2)}, {pa_cycle_count}, {np.round(clock.getTime()-pa_start, 2)}, {np.round(pa_ang, 2)}, \
