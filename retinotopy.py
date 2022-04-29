@@ -34,8 +34,11 @@ fixation_rotate_rate = 2
 # we can alternate between fixation cross orientation as a subject task
 fixation_orientations = (0, 45)
 
+# the trigger for the scanner at Brussels is 'z'
+scanner_trigger = 'z'
+
 # this will appear just before C keypress and requires button 1 to be pressed move on
-insructions_to_subjects = ''' \n\n\nKeep you eyes on the red cross in the center at
+insructions_to_subjects = ''' \n\n\nKeep your eyes on the red cross in the center at
 all times.
 
 When the red cross rotates, press button 1.
@@ -180,7 +183,7 @@ win.winHandle.activate()
 # on-screen text
 welcome_message = visual.TextStim(win, pos=[0,+0.3], text='Preparing images...')
 C_keypress_message = visual.TextStim(win, pos=[0,+0.3], text='Waiting for Experimenter C Key Press...')
-trigger_message = visual.TextStim(win, pos=[0,+0.3], text='Waiting for Scanner Trigger...')
+trigger_message = visual.TextStim(win, pos=[0,+0.3], text=f'Waiting for Scanner Trigger... ({scanner_trigger}')
 insructions_to_subjects = visual.TextStim(win, pos=[0,+0.3], text=insructions_to_subjects)
 
 # spiderweb background
@@ -366,13 +369,12 @@ while not 'c' in event.getKeys():
     core.wait(0.1)
 
 # =============================================================================
-# start waiting for trigger (coded as z)
-# button_thread.start()
-# trigger_message.draw()
-# win.flip()
-# while not 'z' in event.getKeys():
-#     core.wait(0.1)
-#
+# start waiting for trigger
+ button_thread.start()
+ trigger_message.draw()
+ win.flip()
+ while not scanner_trigger in event.getKeys():
+     core.wait(0.1)
 # =============================================================================
 
 clock = core.Clock()
