@@ -20,8 +20,6 @@ import os
 import pathlib
 # import matplotlib.pyplot as plt
 
-# from vipixx_something_or_other import button_thread
-
 #%% =============================================================================
 # paths and definitions
 
@@ -68,9 +66,9 @@ dialog_info.addField('sub_id:', 'SUB01')
 dialog_info.addField('run_polar:', choices=["No", "Yes"])
 dialog_info.addField('run_ecc:', choices=["No", "Yes"])
 dialog_info.addField('run_bars:', choices=["No", "Yes"])
-dialog_info.addField('pa_cycles:', 18)
+dialog_info.addField('pa_cycles:', 6)
 dialog_info.addField('pa_cycle_duration:', 42.667)
-dialog_info.addField('ecc_cycles:', 15)
+dialog_info.addField('ecc_cycles:', 5)
 dialog_info.addField('ecc_cycle_duration:', 51.333)
 dialog_info.addField('bar_sweeps:', 16)
 dialog_info.addField('bar_sweep_reps:', 1)
@@ -183,7 +181,7 @@ win.winHandle.activate()
 # on-screen text
 welcome_message = visual.TextStim(win, pos=[0,+0.3], text='Preparing images...')
 C_keypress_message = visual.TextStim(win, pos=[0,+0.3], text='Waiting for Experimenter C Key Press...')
-trigger_message = visual.TextStim(win, pos=[0,+0.3], text=f'Waiting for Scanner Trigger... ({scanner_trigger}')
+trigger_message = visual.TextStim(win, pos=[0,+0.3], text=f'Waiting for Scanner Trigger... ({scanner_trigger})')
 insructions_to_subjects = visual.TextStim(win, pos=[0,+0.3], text=insructions_to_subjects)
 
 # spiderweb background
@@ -370,11 +368,10 @@ while not 'c' in event.getKeys():
 
 # =============================================================================
 # start waiting for trigger
- button_thread.start()
- trigger_message.draw()
- win.flip()
- while not scanner_trigger in event.getKeys():
-     core.wait(0.1)
+trigger_message.draw()
+win.flip()
+while not scanner_trigger in event.getKeys():
+    core.wait(0.1)
 # =============================================================================
 
 clock = core.Clock()
