@@ -13,7 +13,7 @@ The baseline will be 12 seconds at the beginning and end of the run. This means 
 
 Saving the log is not really needed once you know what all your timings are going to be (and assuming you keep that the same for every subject).
 
-Exporting masks is a special mode **NOT TO BE USED WHILE SCANNING**. Instead, this is a way to take a lot of screenshots (one every 200ms) to know what area of the visual field was stimulated along with precisely when it was stimulated - which can later be used to fit pRFs where we need - a log of the timings, along with the screenshots themselves will be saved in a folder called 'export'. It will slow down the script quite a bit and so take longer to finish (but the timings in the log take this into account).
+Exporting masks is a special mode **NOT TO BE USED WHILE SCANNING**. Instead, this is a way to take a lot of screenshots (one every 200ms) to know what area of the visual field was stimulated along with precisely when it was stimulated - which can later be used to fit pRFs (see the [matlab-fmri-libraries repository](https://github.com/Goffaux-Lab/matlab-fmri-libraries)) where we need - a log of the timings, along with the screenshots themselves will be saved in a folder called 'export'. It will slow down the script quite a bit and so take longer to finish (but the timings in the log take this into account).
 
 Here is an example of what the subject will see when doing polar angle and eccentricity at the same time:
 
