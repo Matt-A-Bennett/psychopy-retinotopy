@@ -36,7 +36,7 @@ fixation_orientations = (0, 45)
 scanner_trigger = 's'
 
 # this will appear just before C keypress and requires button 1 to be pressed move on
-insructions_to_subjects = ''' \n\n\nKeep your eyes on the red cross in the center at all times.
+instructions_to_subjects = ''' \n\n\nKeep your eyes on the red cross in the center at all times.
 
 When the red cross rotates, press button 1.
 
@@ -181,7 +181,7 @@ win.winHandle.activate()
 welcome_message = visual.TextStim(win, pos=[0,+0.3], text='Preparing images...')
 C_keypress_message = visual.TextStim(win, pos=[0,+0.3], text='Waiting for Experimenter C Key Press...')
 trigger_message = visual.TextStim(win, pos=[0,+0.3], text=f'Waiting for Scanner Trigger... ({scanner_trigger})')
-insructions_to_subjects = visual.TextStim(win, pos=[0,+0.3], text=insructions_to_subjects)
+instructions_to_subjects = visual.TextStim(win, pos=[0,+0.3], text=instructions_to_subjects)
 
 # spiderweb background
 web_dimension = (screenCorrection(win,web_size[0]),web_size[1])
@@ -355,7 +355,7 @@ checkerboard_image = visual.ImageStim(win, image=checkerboard_noninv, units='nor
 #%% =============================================================================
 # start experiment
 
-insructions_to_subjects.draw()
+instructions_to_subjects.draw()
 win.flip()
 while not '1' in event.getKeys():
     core.wait(0.1)
