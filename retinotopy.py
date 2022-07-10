@@ -32,8 +32,8 @@ fixation_rotate_rate = 2
 # we can alternate between fixation cross orientation as a subject task
 fixation_orientations = (0, 45)
 
-# the trigger for the scanner at Brussels is 'z'
-scanner_trigger = 'z'
+# the trigger for the scanner at Brussels is 's'
+scanner_trigger = 's'
 
 # this will appear just before C keypress and requires button 1 to be pressed move on
 insructions_to_subjects = ''' \n\n\nKeep your eyes on the red cross in the center at
@@ -545,6 +545,7 @@ while clock.getTime() - baseline_start < setup['baseline_duration']:
 
 #%% =============================================================================
 # cleanup
-logfile.close()
+if setup['save_log'] == 'Yes':
+    logfile.close()
 win.close()
 core.quit()
