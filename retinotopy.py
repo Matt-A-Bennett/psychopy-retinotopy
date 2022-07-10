@@ -36,8 +36,7 @@ fixation_orientations = (0, 45)
 scanner_trigger = 's'
 
 # this will appear just before C keypress and requires button 1 to be pressed move on
-insructions_to_subjects = ''' \n\n\nKeep your eyes on the red cross in the center at
-all times.
+insructions_to_subjects = ''' \n\n\nKeep your eyes on the red cross in the center at all times.
 
 When the red cross rotates, press button 1.
 
